@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SB Flipper — AH</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="dark"]{--bg:#111113;--bg2:#1a1a1e;--bg3:#222228;--border:#2e2e36;--text:#f0f0f2;--text2:#9090a0;--text3:#55555f;--green:#4ecb71;--red:#e85555;--gold:#f5a623;--purple:#a78bfa;--blue:#60a5fa;--shadow:0 2px 16px rgba(0,0,0,.5)}
+:root[data-theme="light"]{--bg:#f5f5f7;--bg2:#fff;--bg3:#ebebef;--border:#dddde8;--text:#111114;--text2:#606070;--text3:#aaaabc;--green:#1a9940;--red:#c83030;--gold:#b87300;--purple:#7c3aed;--blue:#2563eb;--shadow:0 2px 12px rgba(0,0,0,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .25s,color .25s}
+a{text-decoration:none;color:inherit}
+button,input,select{font-family:'Inter',sans-serif}
+button{cursor:pointer}
+
+/* ── Header ── */
+header{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:0 24px}
+.header-inner{max-width:1400px;margin:0 auto;height:56px;display:flex;align-items:center;gap:16px}
+.logo{font-size:17px;font-weight:700;letter-spacing:.02em;display:flex;align-items:baseline;gap:8px}
+.logo-sub{font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;font-weight:400}
+.header-nav{display:flex;gap:4px;margin-left:8px}
+.nav-btn{font-size:13px;color:var(--text2);padding:5px 10px;border-radius:7px;border:none;background:none;font-weight:500;transition:all .15s}
+.nav-btn:hover,.nav-btn.active{color:var(--text);background:var(--bg3)}
+.header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.theme-tog{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:2px;gap:1px}
+.tm{height:28px;padding:0 10px;border-radius:6px;border:none;background:none;font-size:12px;color:var(--text3);font-weight:500;transition:all .15s}
+.tm.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+
+/* ── Buttons ── */
+.btn{height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:13px;font-weight:500;padding:0 14px;display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.btn:hover{border-color:var(--text3);color:var(--text)}
+.btn-p{background:var(--text);border-color:var(--text);color:var(--bg);font-weight:600}
+.btn-p:hover{opacity:.85;color:var(--bg)}
+.btn-sm{height:28px;font-size:12px;padding:0 10px}
+
+/* ── Status bar ── */
+.status-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 24px}
+.status-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--text3);transition:background .3s;flex-shrink:0}
+.sdot.live{background:var(--green);animation:pulse 2s infinite}
+.sdot.loading{background:var(--gold);animation:pulse .7s infinite}
+.sdot.error{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.stat-chip{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:3px 10px;font-size:12px;color:var(--text2)}
+.stat-chip b{color:var(--text);font-weight:600}
+.countdown{font-size:11px;color:var(--text3);margin-left:auto}
+
+/* ── Filter bar ── */
+.filter-wrap{background:var(--bg);border-bottom:1px solid var(--border);padding:10px 24px}
+.filter-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fsearch{background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:6px 12px;outline:none;transition:border-color .15s;width:180px}
+.fsearch:focus{border-color:var(--text3)}
+.fsearch::placeholder{color:var(--text3)}
+.fselect{background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:13px;padding:6px 10px;outline:none;cursor:pointer;transition:border-color .15s;height:34px}
+.fselect:focus{border-color:var(--text3)}
+.chip{padding:5px 11px;border-radius:7px;border:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text3);background:none;transition:all .15s;white-space:nowrap}
+.chip:hover{color:var(--text);border-color:var(--text3)}
+.chip.on{background:var(--text);border-color:var(--text);color:var(--bg);font-weight:600}
+.filter-sep{width:1px;height:20px;background:var(--border);margin:0 4px;flex-shrink:0}
+.filter-spacer{flex:1}
+
+/* ── Main ── */
+.main{max-width:1400px;margin:0 auto;padding:20px 24px}
+
+/* ── Grid ── */
+.auction-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+
+/* ── Card ── */
+.ac{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .15s,box-shadow .15s;animation:cardIn .2s ease both;position:relative}
+.ac:hover{border-color:var(--text3);box-shadow:var(--shadow)}
+@keyframes cardIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.ac.is-new{animation:newFlash .7s ease both}
+@keyframes newFlash{0%{border-color:var(--green);box-shadow:0 0 14px rgba(78,203,113,.35)}70%{border-color:var(--green)}100%{border-color:var(--border);box-shadow:none}}
+
+/* Tier left bar */
+.ac[data-tier="LEGENDARY"]{border-left:3px solid var(--gold)}
+.ac[data-tier="EPIC"]{border-left:3px solid var(--purple)}
+.ac[data-tier="RARE"]{border-left:3px solid var(--blue)}
+.ac[data-tier="UNCOMMON"]{border-left:3px solid var(--green)}
+.ac[data-tier="SPECIAL"],.ac[data-tier="VERY_SPECIAL"]{border-left:3px solid #f472b6}
+
+.ac-inner{padding:12px}
+.ac-head{display:flex;align-items:flex-start;gap:9px;margin-bottom:10px}
+.ac-icon{width:34px;height:34px;border-radius:7px;background:var(--bg3);border:1px solid var(--border);image-rendering:pixelated;flex-shrink:0;object-fit:contain}
+.ac-icon-fb{width:34px;height:34px;border-radius:7px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ac-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;flex:1;min-width:0}
+.ac-tier{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 5px;border-radius:4px;margin-top:3px}
+.tier-LEGENDARY{background:rgba(245,166,35,.13);color:var(--gold)}
+.tier-EPIC{background:rgba(167,139,250,.13);color:var(--purple)}
+.tier-RARE{background:rgba(96,165,250,.13);color:var(--blue)}
+.tier-UNCOMMON{background:rgba(78,203,113,.13);color:var(--green)}
+.tier-COMMON{background:var(--bg3);color:var(--text3)}
+.tier-SPECIAL,.tier-VERY_SPECIAL{background:rgba(244,114,182,.13);color:#f472b6}
+.ac-price{font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px;font-variant-numeric:tabular-nums}
+.ac-price-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.ac-meta{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.ac-cat{font-size:10px;color:var(--text3);background:var(--bg3);padding:2px 6px;border-radius:5px}
+.ac-timer{font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums}
+.ac-timer.soon{color:var(--red)}
+.ac-timer.very-soon{color:var(--red);font-weight:700;animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* ── Empty / Loading ── */
+.grid-empty{grid-column:1/-1;padding:80px 24px;text-align:center;color:var(--text3)}
+.empty-icon{font-size:32px;opacity:.4;margin-bottom:10px}
+.empty-title{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.empty-sub{font-size:13px}
+.skeleton{background:var(--bg2);border:1px solid var(--border);border-radius:14px;height:140px;overflow:hidden;position:relative}
+.skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 25%,var(--bg3) 50%,transparent 75%);background-size:400% 100%;animation:shimmer 1.3s infinite}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.spinner{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--text2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{padding:60px;text-align:center;color:var(--text3);display:flex;flex-direction:column;align-items:center;gap:12px}
+
+/* ── Pagination ── */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:20px 24px;flex-wrap:wrap}
+.pg-btn{height:32px;min-width:32px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:500;transition:all .15s}
+.pg-btn:hover{border-color:var(--text3);color:var(--text)}
+.pg-btn.active{background:var(--text);border-color:var(--text);color:var(--bg)}
+.pg-btn:disabled{opacity:.35;cursor:default}
+.pg-info{font-size:12px;color:var(--text3);padding:0 4px}
+
+/* ── Modal ── */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-ov.open{display:flex;animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:460px;overflow:hidden;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 16px 60px rgba(0,0,0,.6)}
+.modal-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;gap:10px}
+.modal-head-left{display:flex;align-items:flex-start;gap:10px;min-width:0;flex:1}
+.modal-icon{width:40px;height:40px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);image-rendering:pixelated;flex-shrink:0;object-fit:contain}
+.modal-icon-fb{width:40px;height:40px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);line-height:1.3}
+.modal-close{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.modal-close:hover{border-color:var(--text3);color:var(--text)}
+.modal-body{padding:16px 20px;overflow-y:auto;flex:1}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--text2)}
+.info-val{color:var(--text);font-weight:600;text-align:right}
+.lore-box{margin-top:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:11px;font-family:monospace;line-height:1.65;max-height:180px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;color:var(--text2)}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0}
+.modal-ah-btn{display:block;width:100%;background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:700;transition:opacity .15s}
+.modal-ah-btn:hover{opacity:.85}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:500;z-index:700;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  header,header{padding:0 14px}
+  .status-bar,.filter-wrap,.main{padding-left:14px;padding-right:14px}
+  .header-nav{display:none}
+  .fsearch{width:130px}
+  .auction-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px}
+}
+::-webkit-scrollbar{display:none}
+*{scrollbar-width:none;-ms-overflow-style:none}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <div class="logo">SB Flipper <span class="logo-sub">BIN Auctions</span></div>
+    <nav class="header-nav">
+      <a class="nav-btn" href="https://sb-vault.github.io/" target="_blank">← The Vault</a>
+      <a class="nav-btn" href="https://sb-vault.github.io/tools" target="_blank">Tools</a>
+    </nav>
+    <div class="header-right">
+      <div class="theme-tog">
+        <button class="tm active" id="tmDark" onclick="setTheme('dark')">Dark</button>
+        <button class="tm" id="tmLight" onclick="setTheme('light')">Light</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Status bar -->
+<div class="status-bar">
+  <div class="status-inner">
+    <div class="status-pill">
+      <div class="sdot" id="sdot"></div>
+      <span id="stext">Connecting…</span>
+    </div>
+    <div class="stat-chip">BIN: <b id="stat-total">–</b></div>
+    <div class="stat-chip">Showing: <b id="stat-showing">–</b></div>
+    <div class="stat-chip">Updated: <b id="stat-updated">–</b></div>
+    <span class="countdown" id="countdown">Next refresh in –s</span>
+    <button class="btn btn-sm" onclick="refreshNow()">↺ Refresh</button>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div class="filter-wrap">
+  <div class="filter-inner">
+    <input class="fsearch" id="fs-search" placeholder="Search item…" oninput="applyFilters()">
+    <div class="filter-sep"></div>
+    <button class="chip" data-cat="" onclick="setCat(this)">All</button>
+    <button class="chip" data-cat="weapon" onclick="setCat(this)">⚔️ Weapon</button>
+    <button class="chip" data-cat="armor" onclick="setCat(this)">🛡️ Armor</button>
+    <button class="chip" data-cat="accessories" onclick="setCat(this)">💍 Accessories</button>
+    <button class="chip" data-cat="consumables" onclick="setCat(this)">🧪 Consumables</button>
+    <button class="chip" data-cat="blocks" onclick="setCat(this)">🧱 Blocks</button>
+    <button class="chip" data-cat="misc" onclick="setCat(this)">📦 Misc</button>
+    <div class="filter-sep"></div>
+    <select class="fselect" id="fs-tier" onchange="applyFilters()">
+      <option value="">All Tiers</option>
+      <option value="LEGENDARY">Legendary</option>
+      <option value="EPIC">Epic</option>
+      <option value="RARE">Rare</option>
+      <option value="UNCOMMON">Uncommon</option>
+      <option value="COMMON">Common</option>
+      <option value="SPECIAL">Special</option>
+    </select>
+    <div class="filter-sep"></div>
+    <input class="fsearch" id="fs-min" placeholder="Min price" type="number" style="width:110px" oninput="applyFilters()">
+    <input class="fsearch" id="fs-max" placeholder="Max price" type="number" style="width:110px" oninput="applyFilters()">
+    <div class="filter-spacer"></div>
+    <select class="fselect" id="fs-sort" onchange="applyFilters()">
+      <option value="end_asc">Ending Soon</option>
+      <option value="price_asc">Price ↑</option>
+      <option value="price_desc">Price ↓</option>
+      <option value="new">Newest Listed</option>
+      <option value="name_asc">Name A→Z</option>
+    </select>
+  </div>
+</div>
+
+<!-- Grid -->
+<div class="main">
+  <div class="auction-grid" id="grid">
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</div>
+
+<!-- Pagination -->
+<div class="pagination" id="pagination"></div>
+
+<!-- Modal -->
+<div class="modal-ov" id="modal-ov" onclick="handleModalClick(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <div id="m-icon" class="modal-icon-fb">📦</div>
+        <div>
+          <div class="modal-title" id="m-title"></div>
+          <div id="m-tier" style="margin-top:4px"></div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="m-rows"></div>
+      <div class="lore-box" id="m-lore"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-ah-btn" id="m-ah-btn">View on SkyCofl ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Config — update WORKER_URL after deploying worker.js ─────────────────
+const WORKER_URL = 'https://sb-flipper.lucas-alexander-pilu.workers.dev';
+const REFRESH_MS = 60000;
+const PAGE_SIZE  = 48;
+
+// ── State ────────────────────────────────────────────────────────────────
+let allAuctions = [], filtered = [], currentPage = 1;
+let lastUUIDs = new Set(), newUUIDs = new Set();
+let refreshTimer = null, countdownTimer = null, nextRefresh = 0;
+let activeCat = '';
+
+// ── Boot ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  applyStoredTheme();
+  // mark first cat chip active
+  document.querySelector('.chip[data-cat=""]').classList.add('on');
+  load();
+  scheduleRefresh();
+  startCountdown();
+});
+
+// ── Fetch ────────────────────────────────────────────────────────────────
+async function load(isRefresh = false) {
+  setStatus('loading', isRefresh ? 'Refreshing…' : 'Loading auctions…');
+  try {
+    const res = await fetch(`${WORKER_URL}/auctions`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.success) throw new Error('bad response');
+
+    const incoming = new Set(data.auctions.map(a => a.uuid));
+    newUUIDs = isRefresh ? new Set([...incoming].filter(u => !lastUUIDs.has(u))) : new Set();
+    lastUUIDs = incoming;
+    allAuctions = data.auctions;
+
+    document.getElementById('stat-total').textContent = fmtN(data.totalBIN);
+    document.getElementById('stat-updated').textContent = timeAgo(data.lastUpdated);
+    setStatus('live', `Live — ${fmtN(data.totalBIN)} BIN auctions`);
+
+    applyFilters();
+    if (isRefresh && newUUIDs.size) toast(`↺ ${newUUIDs.size} new auction${newUUIDs.size > 1 ? 's' : ''}`);
+  } catch (e) {
+    console.error(e);
+    setStatus('error', 'Connection error — retrying soon');
+    toast('⚠ Failed to load — will retry');
+    if (!allAuctions.length) {
+      document.getElementById('grid').innerHTML = `
+        <div class="grid-empty">
+          <div class="empty-icon">⚠️</div>
+          <div class="empty-title">Couldn't reach the worker</div>
+          <div class="empty-sub">Deploy <code>worker.js</code> to Cloudflare and set WORKER_URL in this file.</div>
+        </div>`;
+    }
+  }
+}
+
+// ── Filter / Sort ────────────────────────────────────────────────────────
+function applyFilters() {
+  const search = document.getElementById('fs-search').value.trim().toLowerCase();
+  const tier   = document.getElementById('fs-tier').value;
+  const minP   = parseFloat(document.getElementById('fs-min').value) || 0;
+  const maxP   = parseFloat(document.getElementById('fs-max').value) || Infinity;
+  const sort   = document.getElementById('fs-sort').value;
+
+  filtered = allAuctions.filter(a => {
+    if (search && !a.item_name.toLowerCase().includes(search)) return false;
+    if (activeCat && a.category !== activeCat) return false;
+    if (tier && a.tier !== tier) return false;
+    if (a.starting_bid < minP || a.starting_bid > maxP) return false;
+    return true;
+  });
+
+  if (sort === 'end_asc')    filtered.sort((a, b) => a.end - b.end);
+  else if (sort === 'price_asc')  filtered.sort((a, b) => a.starting_bid - b.starting_bid);
+  else if (sort === 'price_desc') filtered.sort((a, b) => b.starting_bid - a.starting_bid);
+  else if (sort === 'new')        filtered.sort((a, b) => b.end - a.end);
+  else if (sort === 'name_asc')   filtered.sort((a, b) => a.item_name.localeCompare(b.item_name));
+
+  document.getElementById('stat-showing').textContent = fmtN(filtered.length);
+  currentPage = 1;
+  renderGrid();
+  renderPagination();
+}
+
+function setCat(btn) {
+  document.querySelectorAll('.chip[data-cat]').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  activeCat = btn.dataset.cat;
+  applyFilters();
+}
+
+// ── Render Grid ──────────────────────────────────────────────────────────
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const page = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  if (!page.length) {
+    grid.innerHTML = `<div class="grid-empty">
+      <div class="empty-icon">${allAuctions.length ? '🔍' : '⏳'}</div>
+      <div class="empty-title">${allAuctions.length ? 'No results' : 'Loading…'}</div>
+      <div class="empty-sub">${allAuctions.length ? 'Try adjusting your filters.' : ''}</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = page.map((a, i) => cardHTML(a, i)).join('');
+  startTimers();
+}
+
+function cardHTML(a, i) {
+  const tier   = a.tier || 'COMMON';
+  const isNew  = newUUIDs.has(a.uuid);
+  const itemId = guessItemId(a);
+  const endIn  = a.end - Date.now();
+  const tCls   = endIn < 60000 ? 'very-soon' : endIn < 600000 ? 'soon' : '';
+
+  const iconHtml = itemId
+    ? `<img class="ac-icon" src="https://sky.coflnet.com/static/icon/${itemId}"
+         onerror="this.outerHTML='<div class=\\"ac-icon-fb\\">${catEmoji(a.category)}</div>'" alt="" loading="lazy">`
+    : `<div class="ac-icon-fb">${catEmoji(a.category)}</div>`;
+
+  return `<div class="ac${isNew ? ' is-new' : ''}" data-tier="${tier}" onclick="openModal('${a.uuid}')"
+    style="animation-delay:${Math.min(i, 40) * 6}ms">
+    <div class="ac-inner">
+      <div class="ac-head">
+        ${iconHtml}
+        <div style="min-width:0;flex:1">
+          <div class="ac-name">${esc(a.item_name)}</div>
+          <div class="ac-tier tier-${tier}">${tier.replace('_', ' ')}</div>
+        </div>
+      </div>
+      <div class="ac-price">${fmtCoins(a.starting_bid)}</div>
+      <div class="ac-price-label">BIN</div>
+      <div class="ac-meta">
+        <span class="ac-cat">${a.category || '—'}</span>
+        <span class="ac-timer ${tCls}" data-end="${a.end}" id="t-${a.uuid}">${fmtTimer(endIn)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function startTimers() {
+  if (window._ti) clearInterval(window._ti);
+  const els = document.querySelectorAll('.ac-timer[data-end]');
+  if (!els.length) return;
+  const tick = () => {
+    const now = Date.now();
+    els.forEach(el => {
+      const left = parseInt(el.dataset.end) - now;
+      el.textContent = fmtTimer(left);
+      el.className = 'ac-timer ' + (left < 60000 ? 'very-soon' : left < 600000 ? 'soon' : '');
+    });
+  };
+  window._ti = setInterval(tick, 1000);
+  tick();
+}
+
+// ── Pagination ───────────────────────────────────────────────────────────
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const el = document.getElementById('pagination');
+  if (total <= 1) { el.innerHTML = ''; return; }
+
+  let h = `<button class="pg-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  const pages = buildPageRange(currentPage, total);
+  let prev = null;
+  for (const p of pages) {
+    if (prev !== null && p - prev > 1) h += `<span class="pg-info">…</span>`;
+    h += `<button class="pg-btn${p === currentPage ? ' active' : ''}" onclick="goPage(${p})">${p}</button>`;
+    prev = p;
+  }
+  h += `<button class="pg-btn" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>›</button>`;
+  h += `<span class="pg-info">Page ${currentPage} / ${total}</span>`;
+  el.innerHTML = h;
+}
+
+function buildPageRange(cur, total) {
+  const r = [];
+  for (let p = 1; p <= total; p++)
+    if (p === 1 || p === total || Math.abs(p - cur) <= 2) r.push(p);
+  return r;
+}
+
+function goPage(p) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (p < 1 || p > total) return;
+  currentPage = p;
+  renderGrid();
+  renderPagination();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Modal ────────────────────────────────────────────────────────────────
+function openModal(uuid) {
+  const a = allAuctions.find(x => x.uuid === uuid);
+  if (!a) return;
+  const tier = a.tier || 'COMMON';
+  const itemId = guessItemId(a);
+  const endIn = a.end - Date.now();
+
+  const iconEl = document.getElementById('m-icon');
+  if (itemId) {
+    iconEl.outerHTML = `<img id="m-icon" class="modal-icon"
+      src="https://sky.coflnet.com/static/icon/${itemId}"
+      onerror="this.outerHTML='<div id=\\"m-icon\\" class=\\"modal-icon-fb\\">${catEmoji(a.category)}</div>'" alt="">`;
+  } else {
+    iconEl.className = 'modal-icon-fb';
+    iconEl.textContent = catEmoji(a.category);
+  }
+
+  document.getElementById('m-title').textContent = a.item_name;
+  document.getElementById('m-tier').innerHTML = `<span class="ac-tier tier-${tier}">${tier.replace('_', ' ')}</span>`;
+  document.getElementById('m-rows').innerHTML = `
+    <div class="info-row"><span class="info-label">Price</span><span class="info-val" style="font-size:17px">${fmtCoins(a.starting_bid)}</span></div>
+    <div class="info-row"><span class="info-label">Type</span><span class="info-val">BIN</span></div>
+    <div class="info-row"><span class="info-label">Category</span><span class="info-val">${a.category || '—'}</span></div>
+    <div class="info-row"><span class="info-label">Ends in</span><span class="info-val" style="${endIn < 600000 ? 'color:var(--red)' : ''}">${fmtTimer(endIn)}</span></div>
+    <div class="info-row"><span class="info-label">UUID</span><span class="info-val" style="font-size:11px;font-family:monospace">${a.uuid.slice(0, 18)}…</span></div>
+  `;
+  document.getElementById('m-lore').textContent = stripCodes(a.item_lore || '');
+  document.getElementById('m-ah-btn').onclick = () => window.open(`https://sky.coflnet.com/auction/${a.uuid}`, '_blank');
+
+  document.getElementById('modal-ov').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-ov').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleModalClick(e) { if (e.target === document.getElementById('modal-ov')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Refresh ──────────────────────────────────────────────────────────────
+function scheduleRefresh() {
+  nextRefresh = Date.now() + REFRESH_MS;
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(() => { load(true); scheduleRefresh(); }, REFRESH_MS);
+}
+
+function startCountdown() {
+  if (countdownTimer) clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    const s = Math.max(0, Math.round((nextRefresh - Date.now()) / 1000));
+    document.getElementById('countdown').textContent = `Next refresh in ${s}s`;
+  }, 1000);
+}
+
+function refreshNow() {
+  clearTimeout(refreshTimer);
+  load(true);
+  nextRefresh = Date.now() + REFRESH_MS;
+  scheduleRefresh();
+}
+
+// ── Status ───────────────────────────────────────────────────────────────
+function setStatus(state, text) {
+  document.getElementById('sdot').className = 'sdot ' + state;
+  document.getElementById('stext').textContent = text;
+}
+
+// ── Theme ────────────────────────────────────────────────────────────────
+function setTheme(t) {
+  document.documentElement.dataset.theme = t;
+  document.getElementById('tmDark').classList.toggle('active', t === 'dark');
+  document.getElementById('tmLight').classList.toggle('active', t === 'light');
+  localStorage.setItem('ah_theme', t);
+}
+function applyStoredTheme() {
+  const t = localStorage.getItem('ah_theme') || 'dark';
+  setTheme(t);
+}
+
+// ── Toast ────────────────────────────────────────────────────────────────
+let _tt = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (_tt) clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Utils ────────────────────────────────────────────────────────────────
+function fmtN(n) { return n.toLocaleString(); }
+function fmtCoins(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.?0+$/, '') + 'k';
+  return n.toLocaleString();
+}
+function fmtTimer(ms) {
+  if (ms <= 0) return 'Ended';
+  const s = Math.floor(ms / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
+  if (d > 0) return `${d}d ${h % 24}h`;
+  if (h > 0) return `${h}h ${m % 60}m`;
+  if (m > 0) return `${m}m ${s % 60}s`;
+  return `${s}s`;
+}
+function timeAgo(ts) {
+  const s = Math.round((Date.now() - ts) / 1000);
+  return s < 60 ? `${s}s ago` : `${Math.round(s / 60)}m ago`;
+}
+function stripCodes(s) { return s.replace(/§[0-9a-fklmnor]/gi, ''); }
+function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function guessItemId(a) {
+  if (a.extra) {
+    for (const p of a.extra.split(' '))
+      if (/^[A-Z][A-Z0-9_]{2,}$/.test(p) && p !== 'BIN') return p;
+  }
+  return a.item_name.toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/_+$/, '');
+}
+function catEmoji(c) {
+  return {weapon:'⚔️',armor:'🛡️',accessories:'💍',consumables:'🧪',blocks:'🧱',misc:'📦'}[c] || '📦';
+}
+</script>
+</body>
+</html>
